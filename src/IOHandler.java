@@ -4,9 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
-
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
-
 import ljmu.EDepot.Depot;
 import ljmu.EDepot.Driver;
 import ljmu.EDepot.Vehicle;
@@ -20,9 +17,9 @@ public class IOHandler
 {
 	// TODO Annotate IOHandler Code \\
 	// TODO Check for IOHandle Cleanups \\
-	private static ArrayList< Depot > arrDepots = new ArrayList< Depot >();
-	private static boolean boolAlive = true;
-	private static Scanner scanner;
+	private static ArrayList< Depot >	arrDepots	= new ArrayList< Depot >();
+	private static boolean				boolAlive	= false;
+	private static Scanner				scanner;
 
 	/**
 	 * Main method of system
@@ -32,7 +29,7 @@ public class IOHandler
 	public static void main( String[] obj )
 	{
 		DataManager.HandleSampleData();
-		
+
 		InitialiseSystem();
 
 		Depot depot = null;
@@ -45,7 +42,7 @@ public class IOHandler
 		{
 			System.out.println( e.getMessage() );
 			return;
-		}
+		}		 
 	}
 
 	/**
@@ -74,7 +71,7 @@ public class IOHandler
 
 		Driver driver = ValidateUsername( depotSelected );
 
-		if( !ValidatePassword( driver, depotSelected ) )
+		if ( !ValidatePassword( driver, depotSelected ) )
 			return null;
 
 		return depotSelected;
@@ -85,13 +82,12 @@ public class IOHandler
 	 */
 	private static void ShouldDisplayDepotList()
 	{
-		System.out
-				.println( "To display a list of Depot ID's, enter Y\n"
-						+ "Otherwise, press the Enter key" );
+		System.out.println( "To display a list of Depot ID's, enter Y\n"
+				+ "Otherwise, press the Enter key" );
 
 		String strInput = scanner.nextLine().toLowerCase();
 
-		if( strInput.equals( "y" ) )
+		if ( strInput.equals( "y" ) )
 			PrintDepotIDList();
 		else
 			return;
@@ -115,9 +111,8 @@ public class IOHandler
 				return getDepot( strInput );
 			} catch( NotFoundException e )
 			{
-				if( !ShouldRetry( e.getMessage() ) )
-					throw new EscapeException(
-							"### Ending Process ###" );
+				if ( !ShouldRetry( e.getMessage() ) )
+					throw new EscapeException( "### Ending Process ###" );
 			}
 		}
 	}
@@ -136,15 +131,14 @@ public class IOHandler
 		{
 			try
 			{
-				System.out.println(
-						"Please enter your Depot Username (Case Sensitive)" );
+				System.out
+						.println( "Please enter your Depot Username (Case Sensitive)" );
 				String strInput = scanner.nextLine();
 				return depot.getDriver( strInput );
 			} catch( NotFoundException e )
 			{
-				if( !ShouldRetry( e.getMessage() ) )
-					throw new EscapeException(
-							"### Ending Process ###" );
+				if ( !ShouldRetry( e.getMessage() ) )
+					throw new EscapeException( "### Ending Process ###" );
 			}
 		}
 	}
@@ -158,15 +152,15 @@ public class IOHandler
 	 * @return Boolean - True on successful authentication
 	 * @throws Exception
 	 */
-	private static boolean ValidatePassword( Driver driver,
-			Depot depot ) throws EscapeException
+	private static boolean ValidatePassword( Driver driver, Depot depot )
+			throws EscapeException
 	{
 		int intErrorCount = 0;
 
 		while( true )
 		{
-			System.out.println(
-					"Please enter your Depot Password (Case Sensitive)" );
+			System.out
+					.println( "Please enter your Depot Password (Case Sensitive)" );
 
 			String strInput = scanner.nextLine();
 
@@ -177,14 +171,12 @@ public class IOHandler
 			{
 				intErrorCount++;
 
-				if( intErrorCount > 2 )
-					throw new EscapeException(
-							"### Login Count Exceeded ###" );
+				if ( intErrorCount > 2 )
+					throw new EscapeException( "### Login Count Exceeded ###" );
 
-				if( !ShouldRetry( e.getMessage() + " - Attempt "
+				if ( !ShouldRetry( e.getMessage() + " - Attempt "
 						+ intErrorCount + " of 3" ) )
-					throw new EscapeException(
-							"### Ending Process ###" );
+					throw new EscapeException( "### Ending Process ###" );
 			}
 		}
 	}
@@ -202,9 +194,8 @@ public class IOHandler
 	{
 		do
 		{
-			if( !depot.getAuthState() )
-				throw new AuthenticationException(
-						"### Not Authenticated ###" );
+			if ( !depot.getAuthState() )
+				throw new AuthenticationException( "### Not Authenticated ###" );
 
 			DisplayMainMenu( depot );
 			String strInput = scanner.nextLine().toLowerCase();
@@ -228,7 +219,9 @@ public class IOHandler
 				}
 				break;
 			}
-		} while( false );
+		} while( boolAlive );
+
+		System.out.println( "### ESCAPED LOOP ###" );
 	}
 
 	/**
@@ -240,20 +233,18 @@ public class IOHandler
 	private static void DisplayMainMenu( Depot depot )
 	{
 		String strMenuText = "### MAIN MENU "
-				+ ( depot.isManager() ? " - MANAGER MODE" : "" )
-				+ "###\n"
+				+ ( depot.isManager() ? " - MANAGER MODE" : "" ) + "###\n"
 				+ "Please enter the keywords to select an action\n\n"
 				+ "View - View Workschedule";
 
-		if( depot.isManager() )
+		if ( depot.isManager() )
 			strMenuText += "\nSetup - Setup a new schedule"
 					+ "\nMove - Move a vehicle to another depot";
 
 		System.out.println( strMenuText );
 	}
 
-	private static void SetupWorkSchedule( Depot depot )
-			throws EscapeException
+	private static void SetupWorkSchedule( Depot depot ) throws EscapeException
 	{
 		WorkSchedule schedule = RequestScheduleInput( depot );
 		Vehicle vehicle = RequestVehicleInput( depot );
@@ -280,76 +271,47 @@ public class IOHandler
 
 			strInput = scanner.nextLine();
 
-			if( depot.ScheduleMapContains( strInput ) )
-			{
-				if( !ShouldRetry(
-						"Schedule List already contains specified client name" ) )
-					throw new EscapeException(
-							"### Returning to Main Menu ###" );
-				else
-					continue;
-			}
+			/*
+			 * if( depot.ScheduleMapContains( strInput ) ) { if( !ShouldRetry(
+			 * "Schedule List already contains specified client name" ) ) throw
+			 * new EscapeException( "### Returning to Main Menu ###" ); else
+			 * continue; }
+			 */
 
 			schedule.setStrClient( strInput );
 			break;
 		}
 
-		DateFormat format = new SimpleDateFormat( "dd-MM-yy" );
-
 		while( true )
 		{
-			System.out.println(
-					"Please enter a start date (dd-mm-yy)" );
+			System.out.println( "Please enter a start date (dd-mm-yy)" );
 			strInput = scanner.nextLine();
 
 			try
 			{
-				Date date = format.parse( strInput );
-				if( !date.after( new Date() ) )
-					throw new DateException(
-							"### Date must be in the future ###" );
-
-				schedule.setDateStart( date );
+				schedule.setDateStart( strInput );
 				break;
-			} catch( ParseException e )
+			} catch( DateException | ParseException e )
 			{
-				if( !ShouldRetry( e.getMessage() ) )
-					throw new EscapeException(
-							"### Returning to Main Menu ###" );
-			} catch( DateException e )
-			{
-				if( !ShouldRetry( e.getMessage() ) )
-					throw new EscapeException(
-							"### Returning to Main Menu ###" );
+				if ( !ShouldRetry( e.getMessage() ) )
+					throw new EscapeException( "### Returning to Main Menu ###" );
 			}
 		}
 
 		while( true )
 		{
-			System.out
-					.println( "Please enter an end date (dd-mm-yy)" );
+			System.out.println( "Please enter an end date (dd-mm-yy)" );
+
 			strInput = scanner.nextLine();
 
 			try
 			{
-				Date date = format.parse( strInput );
-
-				if( !date.after( schedule.getDateStart() ) )
-					throw new DateException(
-							"### End date must be after of the Start date ###" );
-
-				schedule.setDateStart( date );
+				schedule.setDateStart( strInput );
 				break;
-			} catch( ParseException e )
+			} catch( DateException | ParseException e )
 			{
-				if( !ShouldRetry( e.getMessage() ) )
-					throw new EscapeException(
-							"### Returning to Main Menu ###" );
-			} catch( DateException e )
-			{
-				if( !ShouldRetry( e.getMessage() ) )
-					throw new EscapeException(
-							"### Returning to Main Menu ###" );
+				if ( !ShouldRetry( e.getMessage() ) )
+					throw new EscapeException( "### Returning to Main Menu ###" );
 			}
 		}
 
@@ -379,13 +341,12 @@ public class IOHandler
 
 				String strReply = scanner.nextLine().toLowerCase();
 
-				if( strReply.equals( "v" ) )
+				if ( strReply.equals( "v" ) )
 					PrintVehicleIDList( depot );
-				else if( strReply.equals( "y" ) )
+				else if ( strReply.equals( "y" ) )
 					continue;
 				else
-					throw new EscapeException(
-							"### Returning to Main Menu ###" );
+					throw new EscapeException( "### Returning to Main Menu ###" );
 			}
 		}
 	}
@@ -412,58 +373,58 @@ public class IOHandler
 
 				String strReply = scanner.nextLine().toLowerCase();
 
-				if( strReply.equals( "v" ) )
+				if ( strReply.equals( "v" ) )
 					PrintDriverIDList( depot );
-				else if( strReply.equals( "y" ) )
+				else if ( strReply.equals( "y" ) )
 					continue;
 				else
-					throw new EscapeException(
-							"### Returning to Main Menu ###" );
+					throw new EscapeException( "### Returning to Main Menu ###" );
 			}
 		}
 	}
 
-	private static void MoveVehicle( Depot depot )
-			throws EscapeException
+	private static void MoveVehicle( Depot depot ) throws EscapeException
 	{
 		Vehicle vehicle = RequestVehicleInput( depot );
 		Date moveDate = RequestDateInput( depot, vehicle );
 	}
 
-	private static Date RequestDateInput( Depot depot, Vehicle vehicle ) throws EscapeException
+	private static Date RequestDateInput( Depot depot, Vehicle vehicle )
+			throws EscapeException
 	{
 		DateFormat format = new SimpleDateFormat( "dd-MM-yy" );
-		
+
 		while( true )
 		{
 			System.out.println( "Please enter a start date (dd-mm-yy)" );
 			String strInput = scanner.nextLine();
-			
+
 			try
 			{
 				Date date = format.parse( strInput );
-				
-				if( !date.after( new Date() ) )
-					throw new DateException( "### Date must be in the future ###" );
-				
+
+				if ( !date.after( new Date() ) )
+					throw new DateException(
+						"### Date must be in the future ###" );
+
 				WorkSchedule schedule = vehicle.getSchedule();
-				
-				boolean boolOverlap = date.after( schedule.getDateStart() ) && 
-						date.before( schedule.getDateEnd() );
-				
-				if( boolOverlap )
+
+				boolean boolOverlap = date.after( schedule.getDateStart() )
+						&& date.before( schedule.getDateEnd() );
+
+				if ( boolOverlap )
 					throw new DateException( " " );
-				
+
 				return date;
 			} catch( ParseException e )
 			{
-				if( !ShouldRetry( e.getMessage() ) )
+				if ( !ShouldRetry( e.getMessage() ) )
 					throw new EscapeException( "### Returning to Main Menu ###" );
 			} catch( DateException e )
 			{
-				if( !ShouldRetry( e.getMessage() ) )
+				if ( !ShouldRetry( e.getMessage() ) )
 					throw new EscapeException( "### Returning to Main Menu ###" );
-			}			
+			}
 		}
 	}
 
@@ -495,7 +456,7 @@ public class IOHandler
 
 		String strInput = scanner.nextLine().toLowerCase();
 
-		if( strInput.equals( "y" ) )
+		if ( strInput.equals( "y" ) )
 			return true;
 
 		return false;
@@ -507,18 +468,16 @@ public class IOHandler
 	 * @param strID
 	 * @return Depot
 	 */
-	private static Depot getDepot( String strID )
-			throws NotFoundException
+	private static Depot getDepot( String strID ) throws NotFoundException
 	{
 		for( Depot depot : arrDepots )
 		{
-			if( depot.getID().equalsIgnoreCase( strID ) )
+			if ( depot.getID().equalsIgnoreCase( strID ) )
 				return depot;
 		}
 
-		throw new NotFoundException(
-				"No Depot found with the specified ID"
-						+ "\nPlease try again, or press Enter to end the program" );
+		throw new NotFoundException( "No Depot found with the specified ID"
+				+ "\nPlease try again, or press Enter to end the program" );
 	}
 
 	// GETTERS & SETTERS \\
