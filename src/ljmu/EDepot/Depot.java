@@ -1,6 +1,7 @@
 package ljmu.EDepot;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import ljmu.Exceptions.AuthenticationException;
@@ -15,7 +16,7 @@ public class Depot implements Serializable
 	
 	private HashMap< String, Vehicle > hashVehicles = new HashMap< String, Vehicle >();
 	private HashMap< String, Driver > hashDrivers = new HashMap< String, Driver >();
-	private HashMap< String, WorkSchedule > hashSchedules = new HashMap< String, WorkSchedule >();
+	private ArrayList< WorkSchedule > arrSchedules = new ArrayList< WorkSchedule >();
 	
 	private String strDepotID;
 	
@@ -159,7 +160,7 @@ public class Depot implements Serializable
 	
 	public void AddSchedule( WorkSchedule schedule )
 	{
-		hashSchedules.put( schedule.getStrClient(), schedule );
+		arrSchedules.add( schedule );
 	}
 	
 	/**
@@ -174,11 +175,6 @@ public class Depot implements Serializable
 		
 		driver.setSchedule( schedule );
 		vehicle.setSchedule( schedule );
-	}
-	
-	public boolean ScheduleMapContains( String strClient )
-	{
-		return hashSchedules.containsKey( strClient );
 	}
 
 	// GETTERS & SETTERS \\	
@@ -242,14 +238,14 @@ public class Depot implements Serializable
 		this.hashDrivers = hashDrivers;
 	}
 	
-	public HashMap< String, WorkSchedule > getScheduleMap()
+	public ArrayList< WorkSchedule > getScheduleList()
 	{
-		return hashSchedules;
+		return arrSchedules;
 	}
 	
-	public void setScheduleMap( HashMap< String, WorkSchedule > hashSchedules )
+	public void setScheduleList( ArrayList< WorkSchedule > arrSchedules )
 	{
-		this.hashSchedules = hashSchedules;
+		this.arrSchedules = arrSchedules;
 	}
 	
 	public Driver getAccount()
