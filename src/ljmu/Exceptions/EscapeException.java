@@ -6,6 +6,7 @@ public class EscapeException extends Exception
 
 	/**
 	 * Used to escape a method effectively
+	 * 
 	 * @param strMessage
 	 */
 	public EscapeException( String strMessage )

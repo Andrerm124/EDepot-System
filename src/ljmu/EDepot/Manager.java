@@ -9,7 +9,7 @@ public class Manager extends Driver
 	{
 		super();
 	}
-	
+
 	public Manager( String strUsername, String strPassword )
 	{
 		super( strUsername, strPassword );

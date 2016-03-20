@@ -4,101 +4,126 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
+import ljmu.EDepot.WorkSchedule.ScheduleState;
 import ljmu.Exceptions.DateException;
 
-public class Driver implements Serializable
+public class Driver implements Serializable, ScheduleHelper
 {
-	// TODO Setup Schedule Implementation \\
 	private static final long serialVersionUID = 1570190466015024988L;
 	protected String strUsername;
 	protected String strPassword;
 	protected boolean boolAvailable;
 	private WorkSchedule scheduleActive;
-	protected ArrayList< WorkSchedule > arrSchedules = new ArrayList< WorkSchedule >();
-	
+	protected ArrayList< WorkSchedule > arrSchedules = new ArrayList< >();
+
 	public Driver()
-	{
-		
-	}
-	
+	{}
+
 	public Driver( String strUsername, String strPassword )
 	{
 		this.strUsername = strUsername;
 		this.strPassword = strPassword;
 	}
-	
+
+	@SuppressWarnings( "hiding" )
 	public boolean CheckPassword( String strPassword )
 	{
 		return this.strPassword.equals( strPassword );
 	}
-	
-	public void AddSchedule( WorkSchedule schedule ) throws DateException
+
+	public void AddSchedule( WorkSchedule schedule )
+			throws DateException
 	{
 		if( schedule.getDateStart() == null )
-			throw new DateException( "### Schedule has not been assigned a date ###" );		
-		
-		if( arrSchedules.size() == 0 )
+			throw new DateException(
+					"### Schedule has not been assigned a date ###" );
+
+		if( this.arrSchedules.size() == 0 )
 		{
-			arrSchedules.add( schedule );
+			this.arrSchedules.add( schedule );
 			return;
 		}
-		
+
 		int index = 0;
-		
-		for( WorkSchedule schedLoop : arrSchedules )
+
+		for( WorkSchedule schedLoop : this.arrSchedules )
 		{
 			Date dateStart = schedLoop.getDateStart();
-			
-			if( dateStart == null ||
-					schedule.getDateStart().before( dateStart ) )
+			Date dateEnd = schedLoop.getDateEnd();
+
+			if( dateStart == null
+					|| ( schedule.getDateStart().before( dateStart ) && schedule.getDateEnd().before( dateEnd ) ) )
 			{
-				arrSchedules.add( index, schedule );				
+				this.arrSchedules.add( index, schedule );
 				return;
 			}
-			
+
 			index++;
 		}
-		
-		arrSchedules.add( schedule );
+
+		this.arrSchedules.add( schedule );
 	}
-	
-	// TODO REMOVE THIS \\
-	public void PrintList()
+
+	@Override
+	public void UpdateActiveSchedule( WorkSchedule schedule )
 	{
-		for( WorkSchedule schedule : arrSchedules )
+		if( schedule == this.scheduleActive )
 		{
-			System.out.println( schedule.getDateStart() );
+			if( schedule.getState() != ScheduleState.ACTIVE )
+				this.scheduleActive = null;
 		}
+		else if( schedule.getState() == ScheduleState.ACTIVE )
+			this.scheduleActive = schedule;
 	}
-	
-	public void UpdateDate()
+
+	/**
+	 * Scans the vehicles archived/pending schedules for an overlapping date
+	 * 
+	 * @param date
+	 * @return <b>TRUE when <b>Overlapping</b>
+	 */
+	@Override
+	public boolean ScanForOverlap( Date date )
 	{
-		
+		for( WorkSchedule schedule : this.arrSchedules )
+		{
+			if( date.after( schedule.getDateStart() )
+					&& date.before( schedule.getDateEnd() ) )
+				return true;
+		}
+
+		return false;
 	}
-	
+
 	// GETTERS & SETTERS \\
 	public String getUsername()
 	{
-		return strUsername;
+		return this.strUsername;
 	}
-	
+
 	public String getPassword()
 	{
-		return strPassword;
+		return this.strPassword;
 	}
-	
+
 	public boolean getAvailable()
 	{
-		return boolAvailable;
+		return this.boolAvailable;
 	}
-	
+
 	public void setAvailable( boolean boolAvailable )
 	{
 		this.boolAvailable = boolAvailable;
 	}
-	
-	public void setSchedule( WorkSchedule schedule )
+
+	public void setSchedule( WorkSchedule schedule ) throws DateException
 	{
-		
+		AddSchedule( schedule );
+		schedule.setDriver( this );
+	}
+
+	public ArrayList< WorkSchedule > getScheduleList()
+	{
+		return this.arrSchedules;
 	}
 }

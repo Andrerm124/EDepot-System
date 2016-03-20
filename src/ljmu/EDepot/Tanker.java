@@ -7,36 +7,37 @@ public class Tanker extends Vehicle
 	private static final long serialVersionUID = -5256688007114050911L;
 	private int intLiquidCapacity = -1;
 	private String strLiquidType = "Unspecified";
-	
+
 	public Tanker()
 	{
 		super();
 	}
-	
-	public Tanker( String strMake, String strModel, String strRegNo, int intWeight )
+
+	public Tanker( String strMake, String strModel, String strRegNo,
+			int intWeight )
 	{
 		super( strMake, strModel, strRegNo, intWeight );
 		this.strType = "Tanker";
 	}
-	
+
 	// GETTERS & SETTERS \\
 	public void setCapacity( int intLiquidCapacity )
 	{
 		this.intLiquidCapacity = intLiquidCapacity;
 	}
-	
+
 	public int getCapacity()
 	{
-		return intLiquidCapacity;
+		return this.intLiquidCapacity;
 	}
-	
+
 	public void setLiquidType( String strLiquidType )
 	{
-		this.strLiquidType = strLiquidType; 
+		this.strLiquidType = strLiquidType;
 	}
-	
+
 	public String getLiquidType()
 	{
-		return strLiquidType;
+		return this.strLiquidType;
 	}
 }
